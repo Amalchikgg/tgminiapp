@@ -14,27 +14,24 @@ function App() {
   const [user, setUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
-    // Проверяем, доступен ли объект Telegram
-    if (typeof (window as any).Telegram === "undefined") {
-      console.error("Telegram WebApp API не найден.");
-      return;
-    }
-
     const tg = (window as any).Telegram.WebApp;
 
-    if (!tg) {
-      console.error("Telegram WebApp не инициализирован.");
-      return;
-    }
+    // Убедитесь, что API доступен
+    if (tg) {
+      tg.ready();
 
-    tg.ready();
+      // Логируем для проверки, что есть в initDataUnsafe
+      console.log("initDataUnsafe:", tg.initDataUnsafe);
 
-    // Получаем данные пользователя
-    const userData = tg.initDataUnsafe?.user as TelegramUser;
-    if (userData) {
-      setUser(userData);
+      const userData = tg.initDataUnsafe?.user as TelegramUser;
+
+      if (userData) {
+        setUser(userData); // Устанавливаем данные пользователя
+      } else {
+        console.error("Данные пользователя не найдены.");
+      }
     } else {
-      console.error("Не удалось получить данные пользователя.");
+      console.error("Telegram WebApp API не доступен.");
     }
   }, []);
 
