@@ -14,13 +14,28 @@ function App() {
   const [user, setUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
-    // Инициализация Telegram Web Apps API
+    // Проверяем, доступен ли объект Telegram
+    if (typeof (window as any).Telegram === "undefined") {
+      console.error("Telegram WebApp API не найден.");
+      return;
+    }
+
     const tg = (window as any).Telegram.WebApp;
+
+    if (!tg) {
+      console.error("Telegram WebApp не инициализирован.");
+      return;
+    }
+
     tg.ready();
 
     // Получаем данные пользователя
     const userData = tg.initDataUnsafe?.user as TelegramUser;
-    setUser(userData);
+    if (userData) {
+      setUser(userData);
+    } else {
+      console.error("Не удалось получить данные пользователя.");
+    }
   }, []);
 
   // Функция для отправки данных боту
@@ -35,7 +50,9 @@ function App() {
 
   return (
     <div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
-      <h1 className='text-3xl font-bold mb-4'>Welcome to Telegram MiniApp!</h1>
+      <h1 className='text-3xl font-bold mb-4 text-black'>
+        Welcome to Telegram MiniApp!
+      </h1>
       {user ? (
         <>
           <p className='text-lg mb-4'>
